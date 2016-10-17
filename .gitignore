@@ -34,3 +34,6 @@
 
 # Markdown previews
 *.html
+# Backup files
+*~
+*\#
