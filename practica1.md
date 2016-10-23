@@ -13,7 +13,7 @@ openocd -f interface/ftdi/redbee-econotag.cfg -f board/redbee.cfg
 Y hacer un `telnet` desde otra terminal para ejecutar órdenes con `opencd` en la placa:
 
 ~~~
-telnet localhost:4444
+telnet localhost 4444
 ~~~
 
 Una vez conectados, reseteamos el `target` mediante:
@@ -41,3 +41,10 @@ Si queremos encender la luz verde, basta sustituir en lo anterior el valor `0x10
 
 
 ![Ambas luces encendidas](./imgs/all_lights.JPG)
+
+
+To load the image of a program at the beginning of RAM we could do:
+
+~~~
+load_image "path/ficheros/hello/hello.elf" 0x00400000
+~~~
