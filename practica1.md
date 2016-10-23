@@ -2,6 +2,8 @@
 
 Se pide encender la luz roja de la placa `Econotag`.
 
+![Placa Econotag](./imgs/board.JPG)
+
 Tenemos que conectarnos con `opencd` a la placa
 
 ~~~
@@ -27,6 +29,8 @@ Y seteamos los valores correspondientes al pin `GPIO_44` para habilitarlo como s
 > mww 0x8000005c 0x1000
 ~~~
 
+![Luz roja](./imgs/red_light.JPG)
+
 Si queremos apagarla:
 
 ~~~
@@ -34,3 +38,6 @@ Si queremos apagarla:
 ~~~
 
 Si queremos encender la luz verde, basta sustituir en lo anterior el valor `0x1000` por `0x2000`, y para ambas encendidas a la vez, por `0x3000`.
+
+
+![Ambas luces encendidas](./imgs/all_lights.JPG)
