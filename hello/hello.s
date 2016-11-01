@@ -80,21 +80,28 @@ test_buttons:
         @ Fija el valor del registro 5 dependiendo de los pulsadores
         ldr     r9, =GPIO_DATA0
         ldr     r7, [r9]
-        tst     r7, #IN_S2
+        and     r1, r7, #IN_S2
+        teq     r1, #IN_S2
         ldreq   r5, =LED_RED_MASK
 
-        tst     r7, #IN_S3
+        ldr     r8, [r9]
+        and     r2, r8, #IN_S3
+        teq     r2, #IN_S3
         ldreq   r5, =LED_GREEN_MASK
+
+
+        @ Apagamos el LED no escogido
+        eor     r3, r5, #LED_ALL_MASK
+        str     r3, [r10]
         
         mov     pc, lr
-
 
         
 _start:
         bl      gpio_init
         @ Direcciones de los registros GPIO_DATA_SET1 y GPIO_DATA_RESET1
         ldr     r6, =GPIO_DATA_SET1
-        ldr     r7, =GPIO_DATA_RESET1
+        ldr     r10, =GPIO_DATA_RESET1
         ldr     r5, =LED_RED_MASK
         
 loop:
@@ -108,7 +115,7 @@ loop:
 
         @ Apagamos el led
         bl      test_buttons
-        str     r5, [r6]
+        str     r5, [r10]
 
         @ Pausa corta
         ldr     r0, =DELAY
