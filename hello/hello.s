@@ -63,8 +63,8 @@
 gpio_init:
         @ Configuramos el GPIO44 y el GPIO45 para que ambos sean de salida
         ldr     r4, =GPIO_PAD_DIR1
-        ldr     r5, =LED_ALL_MASK
-        str     r5, [r4]
+        ldr     r3, =LED_ALL_MASK
+        str     r3, [r4]
 
         @ Configuramos salidas de los pulsadores con un 1
         ldr     r6, =GPIO_PAD_DIR0
@@ -72,7 +72,22 @@ gpio_init:
         str     r7, [r6]
         ldr     r4, =GPIO_DATA_SET0
         str     r7, [r4]
+
         mov     pc, lr
+
+
+test_buttons:
+        @ Fija el valor del registro 5 dependiendo de los pulsadores
+        ldr     r9, =GPIO_DATA0
+        ldr     r7, [r9]
+        tst     r7, #IN_S2
+        ldreq   r5, =LED_RED_MASK
+
+        tst     r7, #IN_S3
+        ldreq   r5, =LED_GREEN_MASK
+        
+        mov     pc, lr
+
 
         
 _start:
@@ -80,18 +95,20 @@ _start:
         @ Direcciones de los registros GPIO_DATA_SET1 y GPIO_DATA_RESET1
         ldr     r6, =GPIO_DATA_SET1
         ldr     r7, =GPIO_DATA_RESET1
-        ldr     r8, =LED_RED_MASK
+        ldr     r5, =LED_RED_MASK
         
 loop:
         @ Encendemos el led
-        str     r8, [r6]
+        bl      test_buttons
+        str     r5, [r6]
 
         @ Pausa corta
         ldr     r0, =DELAY
         bl      pause
 
         @ Apagamos el led
-        str     r8, [r6]
+        bl      test_buttons
+        str     r5, [r6]
 
         @ Pausa corta
         ldr     r0, =DELAY
