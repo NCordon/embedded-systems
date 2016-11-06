@@ -39,3 +39,7 @@
 *\#
 
 !econotag-r2-sch.pdf
+
+# Binary files for Econotag
+*.elf
+*.bin
