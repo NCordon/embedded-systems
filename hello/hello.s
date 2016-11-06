@@ -56,9 +56,8 @@
         .code 32
         .text
         .global _start
-        .type   _start, %function        
-
-
+        .type   _start, %function
+        .type   gpio_init, %function
         
 gpio_init:
         @ Configuramos el GPIO44 y el GPIO45 para que ambos sean de salida
