@@ -4,7 +4,7 @@ Se pedía modificar el programa `hello.s` proporcionado por el profesor para que
 
 A cada pulsador le corresponden dos pines. Habrá que fijar uno de ellos a 1, de modo que uno sea de entrada y otro de salida, y cuando pulsemos el pulsador, veamos en la entrada al chip un 1, lo cual querrá decir que se ha presionado el pulsador.
 
-El código modificado, disponible en la carpeta [hello](./hello) se lista a continuación:
+El código modificado, disponible en la carpeta [P2](./P2) se lista a continuación:
 
 ~~~
 @
