@@ -4,54 +4,27 @@
 @
 
 @
-@ Constantes
-@
-
-        @ Registro de control de dirección del GPIO00-GPIO31
-        @ Para fijar la direccion de los pines que gestionan los botones
-        .set GPIO_PAD_DIR0,    0x80000000
-        
-        @ Registro de control de dirección del GPIO32-GPIO63
-        @ Para fijar la direccion de los pines que gestionan los LEDS
-        .set GPIO_PAD_DIR1,    0x80000004
-
-        @ Registro de consulta del GPIO00-GPIO31
-        @ Para comprobar la pulsacion de los botones
-        .set GPIO_DATA0,       0x80000008
-
-        @ Registro de activacion de bits del GPIO00-GPIO31
-        @ Permite inicializar el valor de los pines de los pulsadores
-        .set GPIO_DATA_SET0,   0x80000048
-
-        @ Registro de activacion de bits del GPIO32-GPIO63
-        @ Permite encender los LEDS
-        .set GPIO_DATA_SET1,   0x8000004c
-
-        @ Registro de limpieza de bits del GPIO32-GPIO63
-        @ Permite apagar los LEDS
-        .set GPIO_DATA_RESET1, 0x80000054
-
-        @ El LED rojo está en el GPIO 44 (el bit 12 de los registros GPIO_X_1)
-        @ El LED verde está en el GPIO 45
-        .set LED_RED_MASK,     (1 << 12)
-        .set LED_GREEN_MASK,   (1 << 13)
-        .set LED_ALL_MASK,     (3 << 12)
-
-
-        @ Direcciones en los GPIO_X_0 de las entradas y salidas de los pulsadores
-        .set IN_S2,            (1 << 23)
-        .set IN_S3,            (1 << 22)
-        .set OUT_S2,           (1 << 27)
-        .set OUT_S3,           (1 << 26)
-        .set IN_ALL,           (3 << 22)
-        .set OUT_ALL,          (3 << 26)
-        
-        @ Retardo para el parpadeo
-        .set DELAY,            0x00080000
-
-@
 @ Punto de entrada
 @
+
+        .data
+        
+@ El LED rojo está en el GPIO 44 (el bit 12 de los registros GPIO_X_1)
+@ El LED verde está en el GPIO 45
+LED_RED_MASK: .word (1 << 12);
+LED_GREEN_MASK: .word (1 << 13);
+LED_ALL_MASK: .word (3 << 12);
+
+@ Direcciones en los GPIO_X_0 de las entradas y salidas de los pulsadores
+IN_S2: .word (1 << 23);
+IN_S3: .word (1 << 22);
+OUT_S2: .word (1 << 27);
+OUT_S3: .word (1 << 26);
+IN_ALL: .word (3 << 22);
+OUT_ALL: .word (3 << 26);
+
+@ Retardo para el parpadeo
+DELAY: .word 0x00080000;
 
         .code 32
         .text

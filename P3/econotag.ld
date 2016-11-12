@@ -12,7 +12,6 @@
 
 ENTRY(_start)
 
-
 /*
  * Mapa de memoria de la placa
  */
@@ -32,7 +31,7 @@ SECTIONS
                 *(.text);
         } > ram0
 
-
+/*
         .ram1 :
         {
                 s1 = .;
@@ -47,25 +46,18 @@ SECTIONS
         {
                 s3 = .;
         } > ram3
+*/
 
+        GPIO_BASE         = 0x80000000;
+        GPIO_PAD_DIR0     = GPIO_BASE + 0x00000000;
+        GPIO_PAD_DIR1     = GPIO_BASE + 0x00000004;
+        GPIO_DATA0        = GPIO_BASE + 0x00000008;
+        GPIO_DATA_SET0    = GPIO_BASE + 0x00000048;
+        GPIO_DATA_SET1    = GPIO_BASE + 0x0000004c;
+        GPIO_DATA_RESET1  = GPIO_BASE + 0x00000054;
 
         .data :
         {
-                GPIO_PAD_DIR0: .word GPIO_PAD_DIR0;
-                GPIO_PAD_DIR1: .word GPIO_PAD_DIR1;
-                GPIO_DATA0: .word GPIO_DATA0;
-                GPIO_DATA_SET0: .word GPIO_DATA_SET0;
-                GPIO_DATA_SET1: .word GPIO_DATA_SET1;
-                GPIO_DATA_RESET1: .word GPIO_DATA_RESET1;
-                LED_RED_MASK: .word LED_RED_MASK;
-                LED_GREEN_MASK: .word LED_GREEN_MASK;
-                LED_ALL_MASK: .word LED_ALL_MASK;
-                IN_S2: .word IN_S2;
-                IN_S3: .word IN_S3;
-                OUT_S2: .word OUT_S2;
-                OUT_S3: .word OUT_S3;
-                IN_ALL: .word IN_ALL;
-                OUT_ALL: .word OUT_ALL;
-                DELAY: .word DELAY;
+                *(.data)
         } > ram1
 }
