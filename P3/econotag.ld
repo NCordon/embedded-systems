@@ -48,6 +48,7 @@ SECTIONS
         } > ram3
 */
 
+
         GPIO_BASE         = 0x80000000;
         GPIO_PAD_DIR0     = GPIO_BASE + 0x00000000;
         GPIO_PAD_DIR1     = GPIO_BASE + 0x00000004;
@@ -56,8 +57,21 @@ SECTIONS
         GPIO_DATA_SET1    = GPIO_BASE + 0x0000004c;
         GPIO_DATA_RESET1  = GPIO_BASE + 0x00000054;
 
+/* Alternativamente... */
+/*
+        .gpio 0x80000000 :
+        {
+               GPIO_PAD_DIR0     = .;
+               GPIO_PAD_DIR1     = . + 0x00000004;
+               GPIO_DATA0        = . + 0x00000008;
+               GPIO_DATA_SET0    = . + 0x00000048;
+               GPIO_DATA_SET1    = . + 0x0000004c;
+               GPIO_DATA_RESET1  = . + 0x00000054;
+        }
+*/
         .data :
         {
                 *(.data)
         } > ram1
+
 }
