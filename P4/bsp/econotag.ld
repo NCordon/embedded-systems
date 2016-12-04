@@ -96,7 +96,7 @@ SECTIONS
         .heap _bss_end :
         {
                 _heap_start = .;
-                . += . - _stacks_top;
+                . += (_stacks_bottom - .);
                 _heap_end = .;
         } > ram
 }

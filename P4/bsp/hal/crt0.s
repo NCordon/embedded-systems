@@ -88,12 +88,11 @@ _start:
 @
 @ Inicializamos las pilas para cada modo
 @
+        .set _STACK_FILLER, 0xdeadbeef       
 
-        .set _STACK_FILLER, 0xdeadbeef
-        
         ldr a1, =_stacks_bottom
         ldr a2, =_stacks_top
-        ldr a3, =STACK_FILLER
+        ldr a3, =_STACK_FILLER
         bl  _ram_init
 
 @
