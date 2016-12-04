@@ -28,15 +28,15 @@ SECTIONS
         .startup :
         {
                 *(.startup);
-        }
+        } > ram
         
 
         /* Código del programa */
         .text : ALIGN(4)
         {
                 *(.text);
-        } > ram :
-
+        } > ram
+        
         /* Variables locales inicializadas y distintas de 0*/
         .data :
         {
@@ -44,13 +44,13 @@ SECTIONS
                 *(.data);
                 . = ALIGN(4);
                 _data_end = .;
-        }
+        } > ram
 
         /* Variables globales */
         .rodata :
         {
                 *(.rodata*);
-                .= ALIGN(4);
+                . = ALIGN(4);
         } > ram
 
 
@@ -61,7 +61,7 @@ SECTIONS
                 *(.bss);
                 . = ALIGN(4);
                 *(COMMON);
-                . = ALIGN(4)
+                . = ALIGN(4);
                 _bss_end = .;
         } > ram
         
@@ -91,12 +91,12 @@ SECTIONS
                 . += _fiq_stack_size ;
                 _fiq_stack_top = . ;
                 _stacks_top = . ;  
-        }
+        } > ram
 
         .heap _bss_end :
         {
                 _heap_start = .;
-                . += .-stacks_top;
+                . += . - _stacks_top;
                 _heap_end = .;
-        }
+        } > ram
 }
