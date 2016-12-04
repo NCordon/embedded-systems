@@ -14,6 +14,7 @@
 	.set _ABT_MODE, 0x17
 	.set _UND_MODE, 0x1B
 	.set _SYS_MODE, 0x1F
+        .set _STACK_FILLER, 0xdeadbeef       
 
 @
 @ Sección de código de arranque
@@ -77,6 +78,15 @@ _irq_handler:
 _fiq_handler:
 	b	.
 
+        
+     .type _ram_init, %function
+_ram_init:
+        cmp a1, a2
+        strne a3, [a1], #+4
+        bne _ram_init
+        mov pc, lr
+        
+
 @
 @ Comienza el CRT
 @
@@ -85,30 +95,21 @@ _fiq_handler:
 	.type	_start, %function
 _start:
 
-@
-@ Inicializamos las pilas para cada modo
-@
-        .set _STACK_FILLER, 0xdeadbeef       
 
+@
+@ Rutina para inicializar una zona de memoria RAM
+@
+
+                
         ldr a1, =_stacks_bottom
         ldr a2, =_stacks_top
         ldr a3, =_STACK_FILLER
         bl  _ram_init
 
-@
-@ Rutina para inicializar una zona de memoria RAM
-@
-        
-        .type _ram_init, %function
-_ram_init:
-        cmp a1, a2
-        strne a3, [a1], #+4
-        bne _ram_init
-        mov pc, lr
-        
 @ Pila de los modos undefined, abort, system, FIQ, IRQ, SV
 @ Copiamos en el sp de cada modo el puntero correspondiente a su pila
-        
+
+
         msr cpsr_c, #(_UND_MODE | _IRQ_DISABLE | _FIQ_DISABLE)
         ldr sp, =_und_stack_top
         msr cpsr_c, #(_ABT_MODE | _IRQ_DISABLE | _FIQ_DISABLE)

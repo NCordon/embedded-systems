@@ -3,14 +3,14 @@
 /* Sistemas Empotrados                                                       */
 /*                                                                           */
 /* Linker script para la Redwire EconoTAG                                    */
-/*                                                                           */
+/* Runtime de C para ser cargado por la BIOS de la placa                     */
 /*****************************************************************************/
 
 /*****************************************************************************/
 /* Punto de entrada                                                          */
 /*****************************************************************************/
 
-ENTRY(_start)
+ENTRY(_vector_table)
 
 /*
  * Mapa de memoria de la placa
@@ -25,7 +25,7 @@ SECTIONS
 {
 
         /* Código del cargador */
-        .startup :
+        .startup : ALIGN(4)
         {
                 *(.startup);
         } > ram
@@ -38,7 +38,7 @@ SECTIONS
         } > ram
         
         /* Variables locales inicializadas y distintas de 0*/
-        .data :
+        .data : ALIGN(4)
         {
                 _data_start = .;
                 *(.data);
@@ -91,12 +91,12 @@ SECTIONS
                 . += _fiq_stack_size ;
                 _fiq_stack_top = . ;
                 _stacks_top = . ;  
-        } > ram
+        }
 
         .heap _bss_end :
         {
                 _heap_start = .;
                 . += (_stacks_bottom - .);
                 _heap_end = .;
-        } > ram
+        }
 }
