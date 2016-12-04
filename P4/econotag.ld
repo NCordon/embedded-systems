@@ -23,6 +23,8 @@ MEMORY
 
 SECTIONS
 {
+
+        /* Código del cargador */
         .startup :
         {
                 *(.startup);
@@ -97,5 +99,4 @@ SECTIONS
                 . += .-stacks_top;
                 _heap_end = .;
         }
-
 }

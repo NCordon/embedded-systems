@@ -89,26 +89,64 @@ _start:
 @ Inicializamos las pilas para cada modo
 @
 
+        .set _STACK_FILLER, 0xdeadbeef
+        
+        ldr a1, =_stacks_bottom
+        ldr a2, =_stacks_top
+        ldr a3, =STACK_FILLER
+        bl  _ram_init
+
+@
+@ Rutina para inicializar una zona de memoria RAM
+@
+        
+        .type _ram_init, %function
+_ram_init:
+        cmp a1, a2
+        strne a3, [a1], #+4
+        bne _ram_init
+        mov pc, lr
+        
+@ Pila de los modos undefined, abort, system, FIQ, IRQ, SV
+@ Copiamos en el sp de cada modo el puntero correspondiente a su pila
+        
+        msr cpsr_c, #(_UND_MODE | _IRQ_DISABLE | _FIQ_DISABLE)
+        ldr sp, =_und_stack_top
+        msr cpsr_c, #(_ABT_MODE | _IRQ_DISABLE | _FIQ_DISABLE)
+        ldr sp, =_abt_stack_top
+        msr cpsr_c, #(_SYS_MODE | _IRQ_DISABLE | _FIQ_DISABLE)
+        ldr sp, =_sys_stack_top
+        msr cpsr_c, #(_FIQ_MODE | _IRQ_DISABLE | _FIQ_DISABLE)
+        ldr sp, =_fiq_stack_top
+        msr cpsr_c, #(_IRQ_MODE | _IRQ_DISABLE | _FIQ_DISABLE)
+        ldr sp, =_irq_stack_top
+        msr cpsr_c, #(_SVC_MODE | _IRQ_DISABLE | _FIQ_DISABLE)
+        ldr sp, =_svc_stack_top
+        
+
+        
 @ ESTA PARTE SE COMPLETARÁ EN LA PRÁCTICA 4
 
 @
 @ Inicialización de la plataforma (llamada a bsp_init)
 @
 
-@ ESTA PARTE SE COMPLETARÁ EN LA PRÁCTICA 4
-
+        ldr ip, =bsp_init
+        mov lr, pc
+        bx ip
+        
 @
 @ Cambiamos a modo User y habilitamos las interrupciones
 @
 
-@ ESTA PARTE SE COMPLETARÁ EN LA PRÁCTICA 4
+        msr cpsr_c, #_USR_MODE
+        
 
 @
 @ Salto a main
 @
 
-@ ESTA PARTE SE COMPLETARÁ EN LA PRÁCTICA 4
-
+        b main
 @
 @ Colgamos el sistema si main retorna
 @
