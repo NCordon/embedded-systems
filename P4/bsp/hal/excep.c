@@ -17,9 +17,8 @@ extern volatile excep_handler_t _excep_handlers[excep_max];
 /**
  * Inicializa los manejadores de excepción
  */
-void excep_init ()
-{
-	excep_set_handler (excep_irq, excep_nonnested_irq_handler);
+void excep_init(){
+  excep_set_handler (excep_irq, excep_nonnested_irq_handler);
 }
 
 /*****************************************************************************/
@@ -34,10 +33,9 @@ void excep_init ()
  * 			2: I=1, F=0	(IRQ deshabilitadas, FIQ habilitadas)
  * 			3: I=1, F=1	(IRQ deshabilitadas, FIQ deshabilitadas)
  */
-inline uint32_t excep_disable_ints ()
-{
-	/* ESTA FUNCIÓN SE DEFINIRÁ EN LA PRÁCTICA 5 */
-	return 0;
+inline uint32_t excep_disable_ints(){
+  /* ESTA FUNCIÓN SE DEFINIRÁ EN LA PRÁCTICA 5 */
+  return 0;
 }
 
 /*****************************************************************************/
@@ -50,10 +48,9 @@ inline uint32_t excep_disable_ints ()
  * 			0: I=0	(IRQ habilitadas)
  * 			1: I=1	(IRQ deshabilitadas)
  */
-inline uint32_t excep_disable_irq ()
-{
-	/* ESTA FUNCIÓN SE DEFINIRÁ EN LA PRÁCTICA 5 */
-	return 0;
+inline uint32_t excep_disable_irq(){
+  /* ESTA FUNCIÓN SE DEFINIRÁ EN LA PRÁCTICA 5 */
+  return 0;
 }
 
 /*****************************************************************************/
@@ -66,10 +63,9 @@ inline uint32_t excep_disable_irq ()
  * 			0: F=0	(FIQ habilitadas)
  * 			1: F=1	(FIQ deshabilitadas)
  */
-inline uint32_t excep_disable_fiq ()
-{
-	/* ESTA FUNCIÓN SE DEFINIRÁ EN LA PRÁCTICA 5 */
-	return 0;
+inline uint32_t excep_disable_fiq(){
+  /* ESTA FUNCIÓN SE DEFINIRÁ EN LA PRÁCTICA 5 */
+  return 0;
 }
 
 /*****************************************************************************/
@@ -79,14 +75,13 @@ inline uint32_t excep_disable_fiq ()
  * Esta función sólo funciona en modos privilegiados. Desde modo USER no se
  * permite alterar los bits I y F de los registros de control
  * @param if_bits	Valores anteriores de las máscaras
- * 						0: I=0, F=0	(IRQ habilitadas,    FIQ habilitadas)
- *			 			1: I=0, F=1	(IRQ habilitadas,    FIQ deshabilitadas)
- * 						2: I=1, F=0	(IRQ deshabilitadas, FIQ habilitadas)
- *			 			3: I=1, F=1	(IRQ deshabilitadas, FIQ deshabilitadas)
+ * 	      		0: I=0, F=0	(IRQ habilitadas,    FIQ habilitadas)
+ *			1: I=0, F=1	(IRQ habilitadas,    FIQ deshabilitadas)
+ * 			2: I=1, F=0	(IRQ deshabilitadas, FIQ habilitadas)
+ *			3: I=1, F=1	(IRQ deshabilitadas, FIQ deshabilitadas)
  */
-inline void excep_restore_ints (uint32_t if_bits)
-{
-	/* ESTA FUNCIÓN SE DEFINIRÁ EN LA PRÁCTICA 5 */
+inline void excep_restore_ints (uint32_t if_bits){
+  /* ESTA FUNCIÓN SE DEFINIRÁ EN LA PRÁCTICA 5 */
 }
 
 /*****************************************************************************/
@@ -101,7 +96,7 @@ inline void excep_restore_ints (uint32_t if_bits)
  */
 inline void excep_restore_irq (uint32_t i_bit)
 {
-	/* ESTA FUNCIÓN SE DEFINIRÁ EN LA PRÁCTICA 5 */
+  /* ESTA FUNCIÓN SE DEFINIRÁ EN LA PRÁCTICA 5 */
 }
 
 /*****************************************************************************/
@@ -114,9 +109,8 @@ inline void excep_restore_irq (uint32_t i_bit)
  * 						0: F=0	(FIQ habilitadas)
  * 						1: F=1	(FIQ deshabilitadas)
  */
-inline void excep_restore_fiq (uint32_t f_bit)
-{
-	/* ESTA FUNCIÓN SE DEFINIRÁ EN LA PRÁCTICA 5 */
+inline void excep_restore_fiq(uint32_t f_bit){
+  /* ESTA FUNCIÓN SE DEFINIRÁ EN LA PRÁCTICA 5 */
 }
 
 /*****************************************************************************/
@@ -126,9 +120,9 @@ inline void excep_restore_fiq (uint32_t f_bit)
  * @param excep		Tipo de excepción
  * @param handler	Manejador
  */
-inline void excep_set_handler (excep_t excep, excep_handler_t handler)
-{
-	/* ESTA FUNCIÓN SE DEFINIRÁ EN LA PRÁCTICA 5 */
+inline void excep_set_handler(excep_t excep, excep_handler_t handler){
+  if(excep < excep_max)
+    _excep_handlers[excep] = handler;
 }
 
 /*****************************************************************************/
@@ -137,10 +131,13 @@ inline void excep_set_handler (excep_t excep, excep_handler_t handler)
  * Retorna un manejador de interrupción/excepción
  * @param excep		Tipo de excepción
  */
-inline excep_handler_t excep_get_handler (excep_t excep)
-{
-	/* ESTA FUNCIÓN SE DEFINIRÁ EN LA PRÁCTICA 5 */
-        return NULL;
+inline excep_handler_t excep_get_handler(excep_t excep){
+  except_handler_t result = 0;
+  
+  if(excep < excep_max)
+    result = _excep_handlers[excep];
+  
+  return result;
 }
 
 /*****************************************************************************/
@@ -152,9 +149,8 @@ inline excep_handler_t excep_get_handler (excep_t excep)
  * Para poder gestionar interrupciones anidadas y sacar partiro al controlador
  * de interrupciones es necesario escribir el manejador en ensamblador
  */
-void excep_nonnested_irq_handler ()
-{
-	/* ESTA FUNCIÓN SE DEFINIRÁ EN LA PRÁCTICA 6 */
+void excep_nonnested_irq_handler(){
+  /* ESTA FUNCIÓN SE DEFINIRÁ EN LA PRÁCTICA 6 */
 }
 
 /*****************************************************************************/
