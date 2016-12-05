@@ -38,6 +38,7 @@ SECTIONS
         } > ram
         
         /* Variables locales inicializadas y distintas de 0*/
+        /* Esto no hace falta incluirlo, ya está por defecto incluido en el cargador
         .data : ALIGN(4)
         {
                 _data_start = .;
@@ -45,7 +46,7 @@ SECTIONS
                 . = ALIGN(4);
                 _data_end = .;
         } > ram
-
+        */
         /* Variables globales */
         .rodata :
         {
