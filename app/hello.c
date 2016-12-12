@@ -6,6 +6,9 @@
 /*****************************************************************************/
 
 #include <stdint.h>
+// Incluimos las cabeceras del BSP
+#include "system.h"
+
 
 /*
  * Constantes relativas a la plataforma
@@ -52,17 +55,6 @@ uint32_t the_led;
 
 /*****************************************************************************/
 
-/*
- * Inicialización de los pines de E/S
- */
-void gpio_init(void){
-  // Configuramos ambos LEDS para que sean de salida. Deberían contener un 0 inicialmente
-  *reg_gpio_pad_dir1 = (led_red_mask | led_green_mask);
-  // Configuramos las salidas de los pulsadores (vistas desde la CPU) como un 1
-  *reg_gpio_pad_dir0 = (out_s2 | out_s3);
-  *reg_gpio_data_set0 = (out_s2 | out_s3);
-}
-
 /*****************************************************************************/
 
 /*
@@ -86,6 +78,34 @@ void leds_off (uint32_t mask)
   /* Apagamos los leds indicados en la máscara */
   *reg_gpio_data_reset1 = mask;
 }
+
+
+/*
+ * Nuestro propio manejador de undef
+ */
+
+__attribute__ ((interrupt ("UNDEF")))
+void my_undef_handler(void){
+  // Encendemos el LED verde indicando que se ha producido unan excepción
+  leds_on(led_green_mask);
+}
+
+
+/*
+ * Inicialización de los pines de E/S
+ */
+void gpio_init(void){
+  // Configuramos ambos LEDS para que sean de salida. Deberían contener un 0 inicialmente
+  *reg_gpio_pad_dir1 = (led_red_mask | led_green_mask);
+  // Configuramos las salidas de los pulsadores (vistas desde la CPU) como un 1
+  *reg_gpio_pad_dir0 = (out_s2 | out_s3);
+  *reg_gpio_data_set0 = (out_s2 | out_s3);
+
+  // Fijamos el manejador de las excepciones UNDEF
+  excep_t undef = excep_undef;
+  excep_set_handler(undef, my_undef_handler);
+}
+
 
 /*****************************************************************************/
 
@@ -123,13 +143,17 @@ int main (){
      En función de si se pulsa un pulsador u otro, se hará parpadear uno de los LEDS 
      y se apaga el otro 
   */
+
+  asm(".word 0x26889912\n");
+
+  
   while(1){
-      test_buttons();          
-      leds_on(the_led);
-      pause();
-      leds_off(the_led);
-      pause();
-    }
+    test_buttons();          
+    leds_on(the_led);
+    pause();
+    leds_off(the_led);
+    pause();
+  }
 
   return 0;
 }

@@ -5,6 +5,7 @@
 
 #include "system.h"
 
+
 /*****************************************************************************/
 
 /**
@@ -21,6 +22,7 @@ void excep_init(){
   excep_set_handler (excep_irq, excep_nonnested_irq_handler);
 }
 
+
 /*****************************************************************************/
 
 /**
@@ -34,10 +36,19 @@ void excep_init(){
  * 			3: I=1, F=1	(IRQ deshabilitadas, FIQ deshabilitadas)
  */
 inline uint32_t excep_disable_ints(){
-  /* ESTA FUNCIÓN SE DEFINIRÁ EN LA PRÁCTICA 5 */
-  return 0;
-}
+  uint32_t if_bits;
 
+  asm volatile(
+    "mrs %[bits], cpsr\n\t"
+    "orr r12, %[bits], #0xC0\n\t"
+    "msr cpsr_c, r12"
+    : [bits]"=r"(if_bits)
+    :
+    :    "r12", "cc");
+
+  return (if_bits >> 6)&3;
+}
+    
 /*****************************************************************************/
 
 /**
@@ -81,7 +92,15 @@ inline uint32_t excep_disable_fiq(){
  *			3: I=1, F=1	(IRQ deshabilitadas, FIQ deshabilitadas)
  */
 inline void excep_restore_ints (uint32_t if_bits){
-  /* ESTA FUNCIÓN SE DEFINIRÁ EN LA PRÁCTICA 5 */
+  asm volatile(
+    "mrs r12, cpsr\n\t"
+    "bic r12, r12, #0xC0\n\t"
+    "orr r12, r12, %[bits], LSL #6\n\t"
+    "msr cpsr_c, r12"
+
+    :
+    : [bits]"r"(if_bits & 3)
+    :    "r12", "cc");
 }
 
 /*****************************************************************************/
@@ -121,7 +140,7 @@ inline void excep_restore_fiq(uint32_t f_bit){
  * @param handler	Manejador
  */
 inline void excep_set_handler(excep_t excep, excep_handler_t handler){
-  if(excep < excep_max)
+  //if(excep < excep_max)
     _excep_handlers[excep] = handler;
 }
 
@@ -132,7 +151,7 @@ inline void excep_set_handler(excep_t excep, excep_handler_t handler){
  * @param excep		Tipo de excepción
  */
 inline excep_handler_t excep_get_handler(excep_t excep){
-  except_handler_t result = 0;
+  excep_handler_t result = 0;
   
   if(excep < excep_max)
     result = _excep_handlers[excep];

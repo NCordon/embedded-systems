@@ -139,7 +139,7 @@ _start:
 @ Cambiamos a modo User y habilitamos las interrupciones
 @
 
-        msr cpsr_c, #_USR_MODE
+@        msr cpsr_c, #_USR_MODE
         
 
 @
