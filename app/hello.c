@@ -136,7 +136,10 @@ void test_buttons(){
  * Programa principal
  */
 int main (){
+  excep_disable_ints();
   gpio_init();
+  excep_enable_ints();
+  
   the_led = led_red_mask;
 
   /* Bucle infinito

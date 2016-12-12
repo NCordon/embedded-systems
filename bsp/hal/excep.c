@@ -60,8 +60,17 @@ inline uint32_t excep_disable_ints(){
  * 			1: I=1	(IRQ deshabilitadas)
  */
 inline uint32_t excep_disable_irq(){
-  /* ESTA FUNCIÓN SE DEFINIRÁ EN LA PRÁCTICA 5 */
-  return 0;
+  uint32_t i_bit;
+
+  asm volatile(
+    "mrs %[bits], cpsr\n\t"
+    "orr r12, %[bits], #0x80\n\t"
+    "msr cpsr_c, r12"
+    : [bits]"=r"(i_bit)
+    :
+    :    "r12", "cc");
+
+  return (i_bit >> 7)&1;
 }
 
 /*****************************************************************************/
@@ -75,8 +84,17 @@ inline uint32_t excep_disable_irq(){
  * 			1: F=1	(FIQ deshabilitadas)
  */
 inline uint32_t excep_disable_fiq(){
-  /* ESTA FUNCIÓN SE DEFINIRÁ EN LA PRÁCTICA 5 */
-  return 0;
+  uint32_t f_bit;
+
+  asm volatile(
+    "mrs %[bits], cpsr\n\t"
+    "orr r12, %[bits], #0x40\n\t"
+    "msr cpsr_c, r12"
+    : [bits]"=r"(f_bit)
+    :
+    :    "r12", "cc");
+
+  return (f_bit >> 6)&1;
 }
 
 /*****************************************************************************/
@@ -113,9 +131,16 @@ inline void excep_restore_ints (uint32_t if_bits){
  * 						0: I=0	(IRQ habilitadas)
  * 						1: I=1	(IRQ deshabilitadas)
  */
-inline void excep_restore_irq (uint32_t i_bit)
-{
-  /* ESTA FUNCIÓN SE DEFINIRÁ EN LA PRÁCTICA 5 */
+inline void excep_restore_irq (uint32_t i_bit){
+  asm volatile(
+    "mrs r12, cpsr\n\t"
+    "bic r12, r12, #0xC0\n\t"
+    "orr r12, r12, %[bits], LSL #7\n\t"
+    "msr cpsr_c, r12"
+
+    :
+    : [bits]"r"(i_bit & 1)
+    :    "r12", "cc");
 }
 
 /*****************************************************************************/
@@ -129,7 +154,15 @@ inline void excep_restore_irq (uint32_t i_bit)
  * 						1: F=1	(FIQ deshabilitadas)
  */
 inline void excep_restore_fiq(uint32_t f_bit){
-  /* ESTA FUNCIÓN SE DEFINIRÁ EN LA PRÁCTICA 5 */
+  asm volatile(
+    "mrs r12, cpsr\n\t"
+    "bic r12, r12, #0xC0\n\t"
+    "orr r12, r12, %[bits], LSL #6\n\t"
+    "msr cpsr_c, r12"
+
+    :
+    : [bits]"r"(f_bit & 1)
+    :    "r12", "cc");
 }
 
 /*****************************************************************************/
