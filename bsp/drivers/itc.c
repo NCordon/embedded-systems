@@ -91,12 +91,11 @@ inline void itc_set_handler (itc_src_t src, itc_handler_t handler){
  * @param priority	Tipo de prioridad
  */
 inline void itc_set_priority (itc_src_t src, itc_priority_t priority){
-  uint32_t mask = priority;
-  mask << src;
+  uint32_t mask = (priority << src);
 
   if(priority == itc_priority_fast){
     // Limpiamos los 16 bits inferiores. 
-    itc_regs->INTTYPE &= ~((1<<16)-1)
+    itc_regs->INTTYPE &= ~((1<<16)-1);
     itc_regs->INTTYPE |= mask;
   }
 }
@@ -108,7 +107,7 @@ inline void itc_set_priority (itc_src_t src, itc_priority_t priority){
  * @param src		Identificador de la fuente
  */
 inline void itc_enable_interrupt (itc_src_t src){
-  itc_regs->INTENUM = src;
+  itc_regs->INTENNUM = src;
 }
 
 /*****************************************************************************/
@@ -151,9 +150,10 @@ inline void itc_unforce_interrupt (itc_src_t src)
  * anidadas, debe deshabilitar las IRQ de menor prioridad hasta que se haya
  * completado el servicio de la IRQ para evitar inversiones de prioridad
  */
-void itc_service_normal_interrupt ()
-{
-	/* ESTA FUNCIÓN SE DEFINIRÁ EN LA PRÁCTICA 6 */
+void itc_service_normal_interrupt (){
+  itc_src_t src = ((itc_regs->NIVECTOR) & (0xf));
+
+  itc_handlers[src]();
 }
 
 /*****************************************************************************/
@@ -161,9 +161,10 @@ void itc_service_normal_interrupt ()
 /**
  * Da servicio a la interrupción rápida pendiente de más prioridad
  */
-void itc_service_fast_interrupt ()
-{
-	/* ESTA FUNCIÓN SE DEFINIRÁ EN LA PRÁCTICA 6 */
+void itc_service_fast_interrupt (){
+  itc_src_t src = ((itc_regs->FIVECTOR) & (0xf));
+
+  itc_handlers[src]();
 }
 
 /*****************************************************************************/
