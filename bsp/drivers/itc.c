@@ -95,7 +95,8 @@ inline void itc_set_priority (itc_src_t src, itc_priority_t priority){
   mask << src;
 
   if(priority == itc_priority_fast){
-    itc_regs->INTTYPE = 0;
+    // Limpiamos los 16 bits inferiores. 
+    itc_regs->INTTYPE &= ~((1<<16)-1)
     itc_regs->INTTYPE |= mask;
   }
 }
