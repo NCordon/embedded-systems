@@ -10,9 +10,20 @@
 /**
  * Acceso estructurado a los registros de control del ITC del MC1322x
  */
-typedef struct
-{
-	/* ESTA ESTRUCTURA SE DEFINIRÁ EN LA PRÁCTICA 6 */
+typedef struct{
+  uint32_t INTCNTL;
+  uint32_t NIMASK;
+  uint32_t INTENNUM;
+  uint32_t INTDISNUM;
+  uint32_t INTENABLE;
+  uint32_t INTTYPE;
+  char RESERVED[16];
+  uint32_t NIVECTOR;
+  uint32_t FIVECTOR;
+  uint32_t INTSRC;
+  uint32_t INTFRC;
+  uint32_t NIPEND;
+  uint32_t FIPEND;
 } itc_regs_t;
 
 static volatile itc_regs_t* const itc_regs = ITC_BASE;
@@ -21,6 +32,11 @@ static volatile itc_regs_t* const itc_regs = ITC_BASE;
  * Tabla de manejadores de interrupción.
  */
 static itc_handler_t itc_handlers[itc_src_max];
+
+/**
+ * Variable para almacenar una copia de INTENABLE
+ */
+static uint32_t OLD_INTENABLE;
 
 /*****************************************************************************/
 
@@ -41,9 +57,9 @@ inline void itc_init ()
  * Deshabilita el envío de peticiones de interrupción a la CPU
  * Permite implementar regiones críticas en modo USER
  */
-inline void itc_disable_ints ()
-{
-	/* ESTA FUNCIÓN SE DEFINIRÁ EN LA PRÁCTICA 6 */
+inline void itc_disable_ints (){
+  OLD_INTENABLE = itc_regs->INTENABLE;
+  itc_regs->INTENABLE = 0;
 }
 
 /*****************************************************************************/
@@ -52,9 +68,8 @@ inline void itc_disable_ints ()
  * Vuelve a habilitar el envío de peticiones de interrupción a la CPU
  * Permite implementar regiones críticas en modo USER
  */
-inline void itc_restore_ints ()
-{
-	/* ESTA FUNCIÓN SE DEFINIRÁ EN LA PRÁCTICA 6 */
+inline void itc_restore_ints (){
+  itc_regs->INTENABLE = OLD_INTENABLE;  
 }
 
 /*****************************************************************************/
@@ -64,9 +79,8 @@ inline void itc_restore_ints ()
  * @param src		Identificador de la fuente
  * @param handler	Manejador
  */
-inline void itc_set_handler (itc_src_t src, itc_handler_t handler)
-{
-	/* ESTA FUNCIÓN SE DEFINIRÁ EN LA PRÁCTICA 6 */
+inline void itc_set_handler (itc_src_t src, itc_handler_t handler){
+  itc_handlers[src] = handler;
 }
 
 /*****************************************************************************/
@@ -76,9 +90,14 @@ inline void itc_set_handler (itc_src_t src, itc_handler_t handler)
  * @param src		Identificador de la fuente
  * @param priority	Tipo de prioridad
  */
-inline void itc_set_priority (itc_src_t src, itc_priority_t priority)
-{
-	/* ESTA FUNCIÓN SE DEFINIRÁ EN LA PRÁCTICA 6 */
+inline void itc_set_priority (itc_src_t src, itc_priority_t priority){
+  uint32_t mask = priority;
+  mask << src;
+
+  if(priority == itc_priority_fast){
+    itc_regs->INTTYPE = 0;
+    itc_regs->INTTYPE |= mask;
+  }
 }
 
 /*****************************************************************************/
@@ -87,9 +106,8 @@ inline void itc_set_priority (itc_src_t src, itc_priority_t priority)
  * Habilita las interrupciones de una determinda fuente
  * @param src		Identificador de la fuente
  */
-inline void itc_enable_interrupt (itc_src_t src)
-{
-	/* ESTA FUNCIÓN SE DEFINIRÁ EN LA PRÁCTICA 6 */
+inline void itc_enable_interrupt (itc_src_t src){
+  itc_regs->INTENUM = src;
 }
 
 /*****************************************************************************/
@@ -98,9 +116,8 @@ inline void itc_enable_interrupt (itc_src_t src)
  * Deshabilita las interrupciones de una determinda fuente
  * @param src		Identificador de la fuente
  */
-inline void itc_disable_interrupt (itc_src_t src)
-{
-	/* ESTA FUNCIÓN SE DEFINIRÁ EN LA PRÁCTICA 6 */
+inline void itc_disable_interrupt (itc_src_t src){
+  itc_regs->INTDISNUM = src;
 }
 
 /*****************************************************************************/

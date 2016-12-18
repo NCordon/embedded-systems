@@ -136,9 +136,9 @@ void test_buttons(){
  * Programa principal
  */
 int main (){
-  excep_disable_ints();
+  uint32_t mask = excep_disable_ints();
   gpio_init();
-  excep_enable_ints();
+  excep_restore_ints(mask);
   
   the_led = led_red_mask;
 
