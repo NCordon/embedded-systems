@@ -12,24 +12,15 @@
  * Acceso estructurado a los registros de control del gpio del MC1322x
  */
 typedef struct{
-  uint32 GPIO_PAD_DIR0;
-  uint32 GPIO_PAD_DIR1;
-  uint32 GPIO_DATA0;
-  uint32 GPIO_DATA1;
+  uint32 GPIO_PAD_DIR[2];
+  uint32 GPIO_DATA[2];
   uint32 RESERVED[2];
-  uint32 GPIO_FUNC_SEL0;
-  uint32 GPIO_FUNC_SEL1;
-  uint32 GPIO_FUNC_SEL2;
-  uint32 GPIO_FUNC_SEL3;
+  uint32 GPIO_FUNC_SEL[4];
   uint32 RESERVED2[8];
-  uint32 GPIO_DATA_SET0;
-  uint32 GPIO_DATA_SET1;
-  uint32 GPIO_DATA_RESET0;
-  uint32 GPIO_DATA_RESET1;
-  uint32 GPIO_PAD_DIR_SET0;
-  uint32 GPIO_PAD_DIR_SET1;
-  uint32 GPIO_PAD_DIR_RESET0;
-  uint32 GPIO_PAD_DIR_RESET1;
+  uint32 GPIO_DATA_SET[2];
+  uint32 GPIO_DATA_RESET[2];
+  uint32 GPIO_PAD_DIR_SET[2];
+  uint32 GPIO_PAD_DIR_RESET[2];
 } gpio_regs_t;
 
 static volatile gpio_regs_t* const gpio_regs = GPIO_BASE;
@@ -40,14 +31,13 @@ static volatile gpio_regs_t* const gpio_regs = GPIO_BASE;
  * Fija la dirección los pines seleccionados en la máscara como de entrada
  *
  * @param 	port 	Puerto
+ * @pre         port    Supone puerto menor que gpio_port_max (esto es, 0 o 1)
  * @param 	mask 	Máscara para seleccionar los pines
  * @return	gpio_no_error si los parámetros de entrada son corectos o
  *			gpio_invalid_parameter en otro caso
  */
-inline gpio_err_t gpio_set_port_dir_input (gpio_port_t port, uint32_t mask)
-{
-  /* ESTA FUNCIÓN SE DEFINIRÁ EN LA PRÁCTICA 7 */
-
+inline gpio_err_t gpio_set_port_dir_input (gpio_port_t port, uint32_t mask){
+  gpio_regs-> GPIO_DATA_DIR_RESET[port] = mask;
   return gpio_no_error;
 }
 
@@ -57,14 +47,13 @@ inline gpio_err_t gpio_set_port_dir_input (gpio_port_t port, uint32_t mask)
  * Fija la dirección los pines seleccionados en la máscara como de salida
  *
  * @param	port 	Puerto
+ * @pre         port    Supone puerto menor que gpio_port_max (esto es, 0 o 1)
  * @param	mask 	Máscara para seleccionar los pines
  * @return	gpio_no_error si los parámetros de entrada son corectos o
  *			gpio_invalid_parameter en otro caso
  */
-inline gpio_err_t gpio_set_port_dir_output (gpio_port_t port, uint32_t mask)
-{
-  /* ESTA FUNCIÓN SE DEFINIRÁ EN LA PRÁCTICA 7 */
-
+inline gpio_err_t gpio_set_port_dir_output (gpio_port_t port, uint32_t mask){
+  gpio_regs-> GPIO_DATA_DIR_SET[port] = mask;
   return gpio_no_error;
 }
 
@@ -74,13 +63,12 @@ inline gpio_err_t gpio_set_port_dir_output (gpio_port_t port, uint32_t mask)
  * Fija la dirección del pin indicado como de entrada
  *
  * @param	pin 	Número de pin
+ * @pre         pin     Suponemos un número de pin correcto
  * @return	gpio_no_error si los parámetros de entrada son corectos o
  *			gpio_invalid_parameter en otro caso
  */
-inline gpio_err_t gpio_set_pin_dir_input (gpio_pin_t pin)
-{
-  /* ESTA FUNCIÓN SE DEFINIRÁ EN LA PRÁCTICA 7 */
-
+inline gpio_err_t gpio_set_pin_dir_input (gpio_pin_t pin){
+  gpio_regs-> GPIO_DATA_DIR_RESET[pin/32] = (1 << (pin%32));
   return gpio_no_error;
 }
 
@@ -90,13 +78,12 @@ inline gpio_err_t gpio_set_pin_dir_input (gpio_pin_t pin)
  * Fija la dirección del pin indicado como de salida
  *
  * @param	pin 	Número de pin
+ * @pre         pin     Suponemos un número de pin correcto
  * @return	gpio_no_error si los parámetros de entrada son corectos o
  *			gpio_invalid_parameter en otro caso
  */
-inline gpio_err_t gpio_set_pin_dir_output (gpio_pin_t pin)
-{
-  /* ESTA FUNCIÓN SE DEFINIRÁ EN LA PRÁCTICA 7 */
-
+inline gpio_err_t gpio_set_pin_dir_output (gpio_pin_t pin){
+  gpio_regs-> GPIO_DATA_DIR_SET[pin/32] = (1 << (pin%32));
   return gpio_no_error;
 }
 
