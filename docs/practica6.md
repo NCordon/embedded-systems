@@ -1,33 +1,20 @@
 # Práctica 6
 
 
----------------------
 | Num int | Fuente  |
----------------------
+|---------|---------|
 | 15 - 11 | no usada|
----------------------
 |   10    |   SPI   |
----------------------
 |    9    |   ADC   |
----------------------
 |    8    |   SSI   |
----------------------
 |    7    |   MACA  |
----------------------
 |    6    |   SPIF  |
----------------------
 |    5    |   TMR   |
----------------------
 |    4    |   I2C   |
----------------------
 |    3    |   CRM   |
----------------------
 |    2    |  UART2  |
----------------------
 |    1    |  UART1  |
----------------------
 |    0    |   ASM   |
----------------------
 
 ## Mapa de interrupciones de memoria
 
@@ -53,7 +40,7 @@ Se usa el INTTYPE para indicar el tipo de interrupción (I o Q). Si el bit se fi
 `itc_service_normal_interrupt`
 `itc_service_fast_interrupt`
 
-hacen uso de la tabla de manejadores `itc_handlers` y de los registros `NIVECTOR` y `FIVECTOR`, que indican el número de fuente de interrupción activa más prioritaria en cada momento.
+Hacen uso de la tabla de manejadores `itc_handlers` y de los registros `NIVECTOR` y `FIVECTOR`, que indican el número de fuente de interrupción activa más prioritaria en cada momento.
 
 
 Debemos implementar: `itc_init`:
