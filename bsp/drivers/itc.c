@@ -1,3 +1,4 @@
+
 /*
  * Sistemas operativos empotrados
  * Driver para el controlador de interrupciones del MC1322x
@@ -46,8 +47,7 @@ static uint32_t OLD_INTENABLE;
  * y habilita el arbitraje de interrupciones Normales y rápidas en el controlador
  * de interupciones.
  */
-inline void itc_init ()
-{
+inline void itc_init (){
 	/* ESTA FUNCIÓN SE DEFINIRÁ EN LA PRÁCTICA 6 */
 }
 
@@ -126,9 +126,8 @@ inline void itc_disable_interrupt (itc_src_t src){
  * Fuerza una interrupción con propósitos de depuración
  * @param src		Identificador de la fuente
  */
-inline void itc_force_interrupt (itc_src_t src)
-{
-	/* ESTA FUNCIÓN SE DEFINIRÁ EN LA PRÁCTICA 6 */
+inline void itc_force_interrupt (itc_src_t src){
+  itc_regs->INTFRC |= (1 << src);
 }
 
 /*****************************************************************************/
@@ -137,9 +136,8 @@ inline void itc_force_interrupt (itc_src_t src)
  * Desfuerza una interrupción con propósitos de depuración
  * @param src		Identificador de la fuente
  */
-inline void itc_unforce_interrupt (itc_src_t src)
-{
-	/* ESTA FUNCIÓN SE DEFINIRÁ EN LA PRÁCTICA 6 */
+inline void itc_unforce_interrupt (itc_src_t src){
+  itc_regs->INTFRC &= ~(1 << src);
 }
 
 /*****************************************************************************/
