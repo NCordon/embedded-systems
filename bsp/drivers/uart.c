@@ -140,8 +140,8 @@ static volatile uart_callbacks_t uart_callbacks[uart_max];
  * @param uart	Identificador de la uart
  * @param br	Baudrate
  * @param name	Nombre del dispositivo
- * @return		Cero en caso de éxito o -1 en caso de error.
- * 				La condición de error se indica en la variable global errno
+ * @return	Cero en caso de éxito o -1 en caso de error.
+ * 		La condición de error se indica en la variable global errno
  */
 int32_t uart_init (uart_id_t uart, uint32_t br, const char *name){
   uint32_t mod = 9999;
@@ -182,10 +182,13 @@ int32_t uart_init (uart_id_t uart, uint32_t br, const char *name){
  * Transmite un byte por la uart
  * Implementación del driver de nivel 0. La llamada se bloquea hasta que transmite el byte
  * @param uart	Identificador de la uart
- * @param c		El carácter
+ * @param c	El carácter
  */
 void uart_send_byte (uart_id_t uart, uint8_t c){
-  /* ESTA FUNCIÓN SE DEFINIRÁ EN LA PRÁCTICA 8 */
+  // Esperamos ocupada hasta que se libere algo de espacio en la cola de transmisión de la UART
+  while(uart_regs[uart] -> Tx_fifo_addr_diff == 0){}
+  // Escribimos el carácter el registro de datos. Desde aquí pasa a la cola
+  uart_regs[uart] -> Tx_data = c;
 }
 
 /*****************************************************************************/
@@ -194,11 +197,13 @@ void uart_send_byte (uart_id_t uart, uint8_t c){
  * Recibe un byte por la uart
  * Implementación del driver de nivel 0. La llamada se bloquea hasta que recibe el byte
  * @param uart	Identificador de la uart
- * @return		El byte recibido
+ * @return	El byte recibido
  */
 uint8_t uart_receive_byte (uart_id_t uart){
-  /* ESTA FUNCIÓN SE DEFINIRÁ EN LA PRÁCTICA 8 */
-  return 0;
+  // Esperamos ocupada hasta que haya algo que leer en la cola de lectura de la UART
+  while(uart_regs[uart] -> Tx_fifo_addr_diff == 0){}
+  // Leemos el byte
+  return uart_regs[uart] -> Rx_data;
 }
 
 /*****************************************************************************/
