@@ -103,7 +103,28 @@ void test_buttons(){
     the_led = GPIO_GREEN;
     gpio_clear_pin(GPIO_RED);
   }
+}
 
+void test_character(){
+  // Recibimos un carácter por la UART1
+  uint32_t c = uart_receive_byte(uart_1);
+  const int size_msg = 30;
+  int i;
+  
+  if(c=='r'){
+    the_led = GPIO_RED;
+    gpio_clear_pin(GPIO_GREEN);
+  }
+  else if(c=='g'){
+    the_led = GPIO_GREEN;
+    gpio_clear_pin(GPIO_RED);
+  }
+  else{  
+    char msg[]="Teclas válidas: g,r\n";
+
+    for(i=0; i<size_msg; i++)
+      uart_send_byte(uart_1, msg[i]);
+  }
 }
 
 /*
@@ -113,9 +134,11 @@ int main (){
   gpio_init();
   
   the_led = GPIO_RED;
+
   
   while(1){
-    test_buttons();          
+    //test_buttons();
+    test_character();
     leds_on(the_led);
     pause();
     leds_off(the_led);
