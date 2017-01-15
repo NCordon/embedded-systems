@@ -171,7 +171,7 @@ inline gpio_err_t gpio_get_port (gpio_port_t port, uint32_t *port_data){
  *			  gpio_invalid_parameter en otro caso
  */
 inline gpio_err_t gpio_get_pin (gpio_pin_t pin, uint32_t *pin_data){
-  *pin_data = (gpio_regs -> GPIO_DATA[pin/32]);
+  *pin_data = ((gpio_regs -> GPIO_DATA[pin/32]) >> pin%32) & 0x1;
   return gpio_no_error;
 }
 
