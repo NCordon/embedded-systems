@@ -144,7 +144,34 @@ static volatile uart_callbacks_t uart_callbacks[uart_max];
  * 				La condición de error se indica en la variable global errno
  */
 int32_t uart_init (uart_id_t uart, uint32_t br, const char *name){
-  /* ESTA FUNCIÓN SE DEFINIRÁ EN LAS PRÁCTICAS 8, 9 y 10 */
+  uint32_t mod = 9999;
+  uint32_t inc = br * mod / (CPU_FREQ >> 4);
+
+  // Fijamos los parámetros por defecto y deshabilitamos la UART,
+  // ya que esta debe estar deshabilitada para poder fijar la frecuencia
+  // Ponemos 1 en los registros 13 y 14 del UCON para enmascarar las interrupciones,
+  // y 0 ne los registros RxE y TxE para desactivar la recepción y transmisión
+  uart_regs[uart]-> CON = (3 << 13);
+
+  // Fijamos la frecuencia con un oversampling de 8x
+  uart_regs[uart]-> BR = (inc << 16) | mod;
+
+  // Habilitamos la UART. En el MC1322x hay que habilitar el periférico
+  // antes de fijar la función de sus pines. Ponemos 11 en RxE y TxE para activar la UART
+  // y habilitamos de nuevo las interrupciones
+  uart_regs[uart]-> CON |= 3;
+
+  // Cambiamos la función de los pines
+  gpio_set_pin_func(uart_pins[uart].tx,  gpio_func_alternate_1);
+  gpio_set_pin_func(uart_pins[uart].rx,  gpio_func_alternate_1);
+  gpio_set_pin_func(uart_pins[uart].cts, gpio_func_alternate_1);
+  gpio_set_pin_func(uart_pins[uart].rts, gpio_func_alternate_1);
+
+  // Fijamos TX y CTS como salidas y RX y RTS como entradas
+  gpio_set_pin_dir_output(uart_pins[uart].tx);
+  gpio_set_pin_dir_output(uart_pins[uart].cts);
+  gpio_set_pin_dir_input(uart_pins[uart].rx);
+  gpio_set_pin_dir_input(uart_pins[uart].rts);
 
   return 0;
 }

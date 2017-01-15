@@ -94,8 +94,7 @@ void test_buttons(){
   uint32_t in_s3;
   gpio_get_pin(GPIO_IN_S2, &in_s2);
   gpio_get_pin(GPIO_IN_S3, &in_s3);  
-
-  in_s2 = 
+ 
   if(in_s2){
     the_led = GPIO_RED;
     gpio_clear_pin(GPIO_GREEN);
