@@ -58,7 +58,7 @@ inline void itc_init (){
   // Deshabilitamos todas las fuentes de interrupción
   itc_regs -> INTENABLE = 0;
   // Ponemos a 0 los bits 19 y 20 para activar el arbitraje de interrupciones IRQ y FIQ
-  intc_regs -> INTCNTL &= ~(11 << 19);
+  itc_regs -> INTCNTL &= ~(11 << 19);
 }
 
 /*****************************************************************************/
