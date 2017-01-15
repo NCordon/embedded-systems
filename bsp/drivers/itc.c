@@ -48,7 +48,17 @@ static uint32_t OLD_INTENABLE;
  * de interupciones.
  */
 inline void itc_init (){
-	/* ESTA FUNCIÓN SE DEFINIRÁ EN LA PRÁCTICA 6 */
+  int i;
+
+  for(i=0; i < itc_src_max; i++)
+    itc_handlers[i] = NULL;
+
+  // Desactivamos la simulación de interrupciones
+  itc_regs -> INTFRC = 0;
+  // Deshabilitamos todas las fuentes de interrupción
+  itc_regs -> INTENABLE = 0;
+  // Ponemos a 0 los bits 19 y 20 para activar el arbitraje de interrupciones IRQ y FIQ
+  intc_regs -> INTCNTL &= ~(11 << 19);
 }
 
 /*****************************************************************************/
@@ -91,13 +101,15 @@ inline void itc_set_handler (itc_src_t src, itc_handler_t handler){
  * @param priority	Tipo de prioridad
  */
 inline void itc_set_priority (itc_src_t src, itc_priority_t priority){
-  uint32_t mask = (priority << src);
+  uint32_t mask = (1 << src);
 
-  if(priority == itc_priority_fast){
-    // Limpiamos los 16 bits inferiores. 
-    itc_regs->INTTYPE &= ~((1<<16)-1);
-    itc_regs->INTTYPE |= mask;
-  }
+  // Si queremos que una interrupción sea FIQ, debemos asegurarnos que sea la única FIQ
+  // En el caso de asignar prioridad de IRQ, sólo debemos hacer 0 el bit correspondiente a src 
+  if(priority == itc_priority_fast)
+    itc_regs->INTTYPE = mask;
+  else
+    itc_regs->INTTYPE &= ~(mask);
+  
 }
 
 /*****************************************************************************/
