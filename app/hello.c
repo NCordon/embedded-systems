@@ -99,8 +99,6 @@ void pause(void){
 int main (){
   gpio_init();
 
-  // Inicializamos el controlador de interrupciones
-  itc_init();
   // Habilitamos la interrupción ASM
   itc_enable_interrupt(itc_src_asm);
   // Le asignamos el manejador que enciende el LED verde y la forzamos
