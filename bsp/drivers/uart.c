@@ -201,7 +201,7 @@ void uart_send_byte (uart_id_t uart, uint8_t c){
  */
 uint8_t uart_receive_byte (uart_id_t uart){
   // Esperamos ocupada hasta que haya algo que leer en la cola de lectura de la UART
-  while(uart_regs[uart] -> Tx_fifo_addr_diff == 0){}
+  while(uart_regs[uart] -> Rx_fifo_addr_diff == 0){}
   // Leemos el byte
   return uart_regs[uart] -> Rx_data;
 }
