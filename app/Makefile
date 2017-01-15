@@ -135,11 +135,13 @@ clean-bsp :
 	@make --no-print-directory -C $(BSP_ROOT_DIR) clean
 
 
-# Ejecución
+# Ejecución. Apaga luces de la placa y detiene el procesador
 .PHONY: halt
 halt: check-openocd
-	@echo "Deteniendo el procesador ..."
+	@echo "Deteniendo el procesador..."
 	@echo -e "halt" | nc -i 1 localhost 4444 > /dev/null
+	@echo "Apagando LEDs..."
+	@echo -e "mww 0x80000064 0x3000" | nc -i 1 localhost 4444 > /dev/null
 
 # Ejecución vía OpenOCD
 .PHONY: run
