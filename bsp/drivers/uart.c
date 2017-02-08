@@ -29,8 +29,8 @@ typedef struct{
       uint32_t xTIM      :1;
       uint32_t FCp       :1;
       uint32_t FCe       :1;
-      uint32_t MTxR      :1;
-      uint32_t MRxR      :1;
+      uint32_t mTxR      :1;
+      uint32_t mRxR      :1;
       uint32_t TST       :1;
     };
     uint32_t CON;
@@ -219,8 +219,25 @@ uint8_t uart_receive_byte (uart_id_t uart){
  * 		La condición de error se indica en la variable global errno
  */
 ssize_t uart_send (uint32_t uart, char *buf, size_t count){
-  /* ESTA FUNCIÓN SE DEFINIRÁ EN LA PRÁCTICA 9 */
-  return count;
+  ssize_t buf_count;
+
+  // Enmascaramos las interrupciones al transmisor
+  uart_regs[uart] -> mTxR = 1;
+
+  // Mientras queden bytes que transmitir y el buffer circular de transmisión no esté lleno
+  //   Escribe un byte en el buffer de transmisión
+  //   Aumenta el conteo de número de bytes escritos
+  //   Decrementa número de bytes todavía por escribir
+  while(!circular_buffer_is_full(&uart_circular_tx_buffers[uart]) && count > 0){
+    circular_buffer_write(&uart_circular_tx_buffers[uart], *buf);
+    buf++;
+    buf_count++;
+    count--;
+  }
+
+  uart_regs[uart] -> mTxR = 0;
+
+  return buf_count;
 }
 
 /*****************************************************************************/
@@ -236,8 +253,26 @@ ssize_t uart_send (uint32_t uart, char *buf, size_t count){
  * 		La condición de error se indica en la variable global errno
  */
 ssize_t uart_receive (uint32_t uart, char *buf, size_t count){
-  /* ESTA FUNCIÓN SE DEFINIRÁ EN LA PRÁCTICA 9 */
-  return 0;
+  ssize_t buf_count;
+
+  // Enmascaramos la interrupciones al receptor
+  uart_regs[uart] -> mRxR = 1;
+
+  
+  // Mientras queden bytes que leer
+  //   Lee un byte del buffer de recepción
+  //   Aumenta el conteo de número de bytes escritos
+  //   Decrementa número de bytes todavía por escribir
+  while(!circular_buffer_is_full(&uart_circular_tx_buffers[uart]) && count > 0){
+    *buf = circular_buffer_read(&uart_circular_tx_buffers[uart]);
+    buf++;
+    buf_count++;
+    count--;
+  }
+
+  uart_regs[uart] -> mRxR = 0;
+
+  return buf_count;
 }
 
 /*****************************************************************************/
