@@ -18,7 +18,7 @@ typedef struct{
   uint32_t INTDISNUM;
   uint32_t INTENABLE;
   uint32_t INTTYPE;
-  char RESERVED[16];
+  uint32_t RESERVED[4];
   uint32_t NIVECTOR;
   uint32_t FIVECTOR;
   uint32_t INTSRC;
@@ -58,7 +58,7 @@ inline void itc_init (){
   // Deshabilitamos todas las fuentes de interrupción
   itc_regs -> INTENABLE = 0;
   // Ponemos a 0 los bits 19 y 20 para activar el arbitraje de interrupciones IRQ y FIQ
-  itc_regs -> INTCNTL &= ~(11 << 19);
+  itc_regs -> INTCNTL = 0;
 }
 
 /*****************************************************************************/

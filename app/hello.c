@@ -97,8 +97,8 @@ void pause(void){
 void test_blink(){
   // Recibimos un carácter por la UART1
   char c[1];
-  uart_receive(uart_1, c, 1);
-
+  //uart_receive_byte(uart_1, c, 1);
+  c[0] = uart_receive_byte(uart_1);
   if(c[0]=='r')
     blink_red = !blink_red;
   else if(c[0]=='g')
@@ -114,7 +114,7 @@ int main (){
   uart_set_receive_callback(uart_1, test_blink);
   
   while(1){
-    test_blink();
+    //test_blink();
     leds_on();
     pause();
     leds_off();

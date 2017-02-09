@@ -69,7 +69,7 @@ typedef struct{
   };
 
   union{
-    uint32_t CTS_Level   :4;
+    uint32_t CTS_Level         :4;
     uint32_t CTS;
   };
     
@@ -188,9 +188,9 @@ int32_t uart_init (uart_id_t uart, uint32_t br, const char *name){
 
 
   // Habilitamos las interrupciones de la uart
-  itc_set_priority( itc_src_uart1 + uart, itc_priority_normal);
-  itc_set_handler( itc_src_uart1 + uart, uart_irq_handlers[uart]);
-  itc_enable_interrupt( itc_src_uart1 + uart);
+  itc_set_priority( itc_src_uart1 + uart, itc_priority_normal );
+  itc_set_handler( itc_src_uart1 + uart, uart_irq_handlers[uart] );
+  itc_enable_interrupt( itc_src_uart1 + uart );
   
   // Generación de interrupciones: cola de envío vacía y recepción de un único byte
   uart_regs[uart] -> TxLevel = 31;
@@ -202,7 +202,8 @@ int32_t uart_init (uart_id_t uart, uint32_t br, const char *name){
   
   // Habilitamos interrupciones en la recepción
   uart_regs[uart] -> mRxR = 0;
-  
+
+  //bsp_register_dev (name, uart, NULL, NULL, uart_receive, uart_send, NULL, NULL, NULL);
   return 0;
 }
 
@@ -216,6 +217,7 @@ int32_t uart_init (uart_id_t uart, uint32_t br, const char *name){
  */
 void uart_send_byte (uart_id_t uart, uint8_t c){
   // Enmascaramos las interrupciones al transmisor
+  uint32_t prev_mTxR = uart_regs[uart]->mTxR;
   uart_regs[uart] -> mTxR = 1;
 
   // Vaciamos el buffer circular
@@ -224,11 +226,11 @@ void uart_send_byte (uart_id_t uart, uint8_t c){
       uart_regs[uart] -> Tx_data = circular_buffer_read( &uart_circular_tx_buffers[uart]);
   
   // Esperamos ocupada hasta que se libere algo de espacio en la cola de transmisión de la UART
-  while(uart_regs[uart] -> Tx_fifo_addr_diff == 0){}
+  while(! uart_regs[uart] -> Tx_fifo_addr_diff){}
   // Escribimos el carácter el registro de datos. Desde aquí pasa a la cola
   uart_regs[uart] -> Tx_data = c;
 
-  uart_regs[uart] -> mTxR = 0;
+  uart_regs[uart] -> mTxR = prev_mTxR;
 }
 
 /*****************************************************************************/
@@ -242,6 +244,7 @@ void uart_send_byte (uart_id_t uart, uint8_t c){
 uint8_t uart_receive_byte (uart_id_t uart){
   // Enmascaramos las interrupciones al receptor
   uint8_t result;
+  uint32_t prev_mRxR = uart_regs[uart]-> mRxR;
   uart_regs[uart] -> mRxR = 1;
   
   // Vaciamos el buffer circular
@@ -249,12 +252,12 @@ uint8_t uart_receive_byte (uart_id_t uart){
     result = circular_buffer_read( &uart_circular_rx_buffers[uart]);
   }
   else{ 
-    while(uart_regs[uart] -> Rx_fifo_addr_diff == 0){}
+    while(! uart_regs[uart] -> Rx_fifo_addr_diff){}
     // Leemos el byte
     result = uart_regs[uart] -> Rx_data;
   }
 
-  uart_regs[uart] -> mRxR = 0;
+  uart_regs[uart] -> mRxR = prev_mRxR;
   return result;
 }
 

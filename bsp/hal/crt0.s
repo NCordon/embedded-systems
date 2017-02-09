@@ -78,6 +78,10 @@ _irq_handler:
 _fiq_handler:
 	b	.
 
+
+@
+@ Rutina para inicializar una zona de memoria RAM
+@
         
      .type _ram_init, %function
 _ram_init:
@@ -94,11 +98,6 @@ _ram_init:
 	.global	_start
 	.type	_start, %function
 _start:
-
-
-@
-@ Rutina para inicializar una zona de memoria RAM
-@
 
                 
         ldr a1, =_stacks_bottom
@@ -124,9 +123,6 @@ _start:
         ldr sp, =_svc_stack_top
         
 
-        
-@ ESTA PARTE SE COMPLETARÁ EN LA PRÁCTICA 4
-
 @
 @ Inicialización de la plataforma (llamada a bsp_init)
 @
@@ -139,14 +135,18 @@ _start:
 @ Cambiamos a modo User y habilitamos las interrupciones
 @
 
-@        msr cpsr_c, #_USR_MODE
+        msr cpsr_c, #_USR_MODE
         
 
 @
 @ Salto a main
 @
 
-        b main
+
+        ldr     ip, =main
+        mov     lr, pc
+        bx      ip
+
 @
 @ Colgamos el sistema si main retorna
 @
