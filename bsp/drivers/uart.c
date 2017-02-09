@@ -185,10 +185,20 @@ int32_t uart_init (uart_id_t uart, uint32_t br, const char *name){
  * @param c	El carácter
  */
 void uart_send_byte (uart_id_t uart, uint8_t c){
+  // Enmascaramos las interrupciones al transmisor
+  uart_regs[uart] -> mTxR = 1;
+
+  // Vaciamos el buffer circular
+  while( !circular_buffer_is_empty( &uart_circular_tx_buffers[uart]) )
+    if(uart_regs[uart] -> Tx_fifo_addr_diff)
+      uart_regs[uart] -> Tx_data = circular_buffer_read( &uart_circular_tx_buffers[uart]);
+  
   // Esperamos ocupada hasta que se libere algo de espacio en la cola de transmisión de la UART
   while(uart_regs[uart] -> Tx_fifo_addr_diff == 0){}
   // Escribimos el carácter el registro de datos. Desde aquí pasa a la cola
   uart_regs[uart] -> Tx_data = c;
+
+  uart_regs[uart] -> mTxR = 0;
 }
 
 /*****************************************************************************/
@@ -200,10 +210,22 @@ void uart_send_byte (uart_id_t uart, uint8_t c){
  * @return	El byte recibido
  */
 uint8_t uart_receive_byte (uart_id_t uart){
-  // Esperamos ocupada hasta que haya algo que leer en la cola de lectura de la UART
-  while(uart_regs[uart] -> Rx_fifo_addr_diff == 0){}
-  // Leemos el byte
-  return uart_regs[uart] -> Rx_data;
+  // Enmascaramos las interrupciones al receptor
+  uint8_t result;
+  uart_regs[uart] -> mRxR = 1;
+  
+  // Vaciamos el buffer circular
+  if( !circular_buffer_is_empty( &uart_circular_rx_buffers[uart]) ){
+    result = circular_buffer_read( &uart_circular_rx_buffers[uart]);
+  }
+  else{ 
+    while(uart_regs[uart] -> Rx_fifo_addr_diff == 0){}
+    // Leemos el byte
+    result = uart_regs[uart] -> Rx_data;
+  }
+
+  uart_regs[uart] -> mRxR = 0;
+  return result;
 }
 
 /*****************************************************************************/
@@ -346,7 +368,7 @@ static inline void uart_isr (uart_id_t uart){
 
   // Interrupción desde el transmisor
   if(uart_regs[uart] -> TxRdy){
-    while( !circular_buffer_is_empty( &uart_circular_rx_buffers[uart]) &&
+    while( !circular_buffer_is_empty( &uart_circular_tx_buffers[uart]) &&
            (uart_regs[uart] -> Tx_fifo_addr_diff > 0) ) 
       uart_regs[uart] -> Tx_data = circular_buffer_read( &uart_circular_tx_buffers[uart]);
 
