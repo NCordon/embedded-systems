@@ -147,6 +147,12 @@ int32_t uart_init (uart_id_t uart, uint32_t br, const char *name){
   uint32_t mod = 9999;
   uint32_t inc = br * mod / (CPU_FREQ >> 4);
 
+  // Comprobamos que la UART existe
+  if(uart >= uart_max){
+    errno = ENODEV;
+    return -1;
+  }
+  
   // Fijamos los parámetros por defecto y deshabilitamos la UART,
   // ya que esta debe estar deshabilitada para poder fijar la frecuencia
   // Ponemos 1 en los registros 13 y 14 del UCON para enmascarar las interrupciones,
@@ -173,6 +179,30 @@ int32_t uart_init (uart_id_t uart, uint32_t br, const char *name){
   gpio_set_pin_dir_input(uart_pins[uart].rx);
   gpio_set_pin_dir_input(uart_pins[uart].rts);
 
+
+  // Inicialización de los buffers circulares
+  circular_buffer_init( &uart_circular_rx_buffers[uart], (uint8_t *) uart_rx_buffer[uart],
+                        sizeof( uart_rx_buffers[uart] ));
+  circular_buffer_init( &uart_circular_tx_buffers[uart], (uint8_t *) uart_tx_buffer[uart],
+                        sizeof( uart_tx_buffers[uart] ));
+
+
+  // Habilitamos las interrupciones de la uart
+  itc_set_priority( itc_src_uart1 + uart, itc_priority_normal);
+  itc_set_handler( itc_src_uart1 + uart, uart_irq_handlers[uart]);
+  itc_enable_interrupt( itc_src_uart1 + uart);
+  
+  // Generación de interrupciones: cola de envío vacía y recepción de un único byte
+  uart_regs[uart] -> TxLevel = 31;
+  uart_regs[uart] -> RxLevel = 1;
+
+  // Sin funciones callback por defecto
+  uart_callbacks[uart].tx_callback = NULL;
+  uart_callbacks[uart].rx_callback = NULL;
+  
+  // Habilitamos interrupciones en la recepción
+  uart_regs[uart] -> mRxR = 0;
+  
   return 0;
 }
 
