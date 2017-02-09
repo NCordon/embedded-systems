@@ -21,6 +21,8 @@ gpio_pin_t const GPIO_IN_S2  = gpio_pin_23;
 gpio_pin_t const GPIO_IN_S3  = gpio_pin_22;
 gpio_pin_t const GPIO_OUT_S2 = gpio_pin_27;
 gpio_pin_t const GPIO_OUT_S3 = gpio_pin_26;
+uint blink_red = 1;
+uint blink_green = 1;
 
 /*
  * Constantes relativas a la aplicacion
@@ -43,9 +45,12 @@ uint32_t the_led;
  * Enciende los leds indicados en la máscara
  * @param mask Máscara para seleccionar leds
  */
-void leds_on (uint32_t led_pin){
+void leds_on(){
   /* Encendemos el led correspondiente a un pin dado*/
-  gpio_set_pin(led_pin);
+  if(blink_red)
+    gpio_set_pin(GPIO_RED);
+  if(blink_green)
+    gpio_set_pin(GPIO_GREEN);
 }
 
 /*****************************************************************************/
@@ -54,9 +59,10 @@ void leds_on (uint32_t led_pin){
  * Apaga los leds indicados en la máscara
  * @param mask Máscara para seleccionar leds
  */
-void leds_off (uint32_t led_pin){
+void leds_off(){
   /* Apagamos el led correspondiente a un pin dado */
-  gpio_clear_pin(led_pin);
+  gpio_clear_pin(GPIO_GREEN);
+  gpio_clear_pin(GPIO_RED);
 }
 
 /*
@@ -88,43 +94,16 @@ void pause(void){
 }
 
 
-void test_buttons(){
-  // Marcamos para encender un LED, apagamos el otro
-  uint32_t in_s2;
-  uint32_t in_s3;
-  gpio_get_pin(GPIO_IN_S2, &in_s2);
-  gpio_get_pin(GPIO_IN_S3, &in_s3);  
- 
-  if(in_s2){
-    the_led = GPIO_RED;
-    gpio_clear_pin(GPIO_GREEN);
-  }
-  else if(in_s3){
-    the_led = GPIO_GREEN;
-    gpio_clear_pin(GPIO_RED);
-  }
-}
-
-void test_character(){
+void test_blink(){
   // Recibimos un carácter por la UART1
-  uint32_t c = uart_receive_byte(uart_1);
-  const int size_msg = 30;
-  int i;
-  
-  if(c=='r'){
-    the_led = GPIO_RED;
-    gpio_clear_pin(GPIO_GREEN);
-  }
-  else if(c=='g'){
-    the_led = GPIO_GREEN;
-    gpio_clear_pin(GPIO_RED);
-  }
-  else{  
-    char msg[]="Teclas válidas: g,r\n";
+  char c[1];
+  uart_receive(uart_1, c, 1);
 
-    for(i=0; i<size_msg; i++)
-      uart_send_byte(uart_1, msg[i]);
-  }
+  if(c[0]=='r')
+    blink_red = !blink_red;
+  else if(c[0]=='g')
+    blink_green = !blink_green;
+  
 }
 
 /*
@@ -132,16 +111,13 @@ void test_character(){
  */
 int main (){
   gpio_init();
-  
-  the_led = GPIO_RED;
-
+  uart_set_receive_callback(uart_1, test_blink);
   
   while(1){
-    //test_buttons();
-    test_character();
-    leds_on(the_led);
+    test_blink();
+    leds_on();
     pause();
-    leds_off(the_led);
+    leds_off();
     pause();
   }
 

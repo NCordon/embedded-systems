@@ -181,9 +181,9 @@ int32_t uart_init (uart_id_t uart, uint32_t br, const char *name){
 
 
   // Inicialización de los buffers circulares
-  circular_buffer_init( &uart_circular_rx_buffers[uart], (uint8_t *) uart_rx_buffer[uart],
+  circular_buffer_init( &uart_circular_rx_buffers[uart], (uint8_t *) uart_rx_buffers[uart],
                         sizeof( uart_rx_buffers[uart] ));
-  circular_buffer_init( &uart_circular_tx_buffers[uart], (uint8_t *) uart_tx_buffer[uart],
+  circular_buffer_init( &uart_circular_tx_buffers[uart], (uint8_t *) uart_tx_buffers[uart],
                         sizeof( uart_tx_buffers[uart] ));
 
 
