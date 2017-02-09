@@ -6,6 +6,7 @@
 /*****************************************************************************/
 
 #include <stdint.h>
+#include <stdio.h>
 // Incluimos las cabeceras del BSP
 #include "system.h"
 
@@ -96,12 +97,11 @@ void pause(void){
 
 void test_blink(){
   // Recibimos un carácter por la UART1
-  char c[1];
-  //uart_receive_byte(uart_1, c, 1);
-  c[0] = uart_receive_byte(uart_1);
-  if(c[0]=='r')
+  char c = getchar();
+  
+  if(c=='r')
     blink_red = !blink_red;
-  else if(c[0]=='g')
+  else if(c=='g')
     blink_green = !blink_green;
   
 }
@@ -114,7 +114,6 @@ int main (){
   uart_set_receive_callback(uart_1, test_blink);
   
   while(1){
-    //test_blink();
     leds_on();
     pause();
     leds_off();
